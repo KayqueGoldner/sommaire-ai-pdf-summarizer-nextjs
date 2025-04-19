@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Source_Sans_3 as FontSans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/sonner";
 
 import { Header } from "@/components/common/header";
 import { Footer } from "@/components/common/footer";
@@ -31,6 +32,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <Toaster position="top-right" richColors />
         </body>
       </html>
     </ClerkProvider>
