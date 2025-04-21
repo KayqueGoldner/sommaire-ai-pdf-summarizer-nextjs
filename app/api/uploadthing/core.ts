@@ -28,7 +28,7 @@ export const ourFileRouter = {
 
       return {
         userId: metadata.userId,
-        file: file.ufsUrl,
+        file: file,
       };
     }),
 } satisfies FileRouter;

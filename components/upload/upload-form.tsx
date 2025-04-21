@@ -2,8 +2,10 @@
 
 import { z } from "zod";
 import { toast } from "sonner";
+import { useRef, useState } from "react";
 
 import { useUploadThing } from "@/utils/uploadthing";
+import { generatePdfSummary } from "@/actions/upload-actions";
 
 import { UploadFormInput } from "./upload-form-input";
 
@@ -19,6 +21,9 @@ const schema = z.object({
 });
 
 export const UploadForm = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
   const { startUpload, routeConfig } = useUploadThing("pdfUploader", {
     onClientUploadComplete: () => {
       console.log("uploaded successfully!");
@@ -37,38 +42,67 @@ export const UploadForm = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
-    const file = formData.get("file") as File;
+    try {
+      setIsLoading(true);
 
-    // validate fields
-    const validatedFields = schema.safeParse({ file });
+      const formData = new FormData(e.currentTarget);
+      const file = formData.get("file") as File;
 
-    if (!validatedFields.success) {
-      toast.error("Invalid file", {
-        duration: 5000,
+      // validate fields
+      const validatedFields = schema.safeParse({ file });
+
+      if (!validatedFields.success) {
+        toast.error("Invalid file", {
+          duration: 5000,
+        });
+        return;
+      }
+
+      toast.loading("Uploading PDF...", { id: "processing" });
+
+      const res = await startUpload([file]);
+
+      if (!res) {
+        toast.error("Error uploading PDF", { id: "processing" });
+        return;
+      }
+
+      toast.loading("PDF uploaded successfully. Summarizing...", {
+        id: "processing",
       });
-      return;
+
+      const result = await generatePdfSummary(res);
+
+      const { data = null, message = null } = result || {};
+
+      if (data) {
+        toast.loading("PDF summary generated successfully. Saving...", {
+          id: "processing",
+        });
+        formRef.current?.reset();
+
+        if (data.summary) {
+          // save to db
+        }
+      } else {
+        toast.error(message, { id: "processing" });
+      }
+    } catch (error) {
+      console.error(error);
+      formRef.current?.reset();
+      toast.error("Error generating summary", { id: "processing" });
+    } finally {
+      setIsLoading(false);
     }
-
-    toast.loading("Uploading PDF...", { id: "processing" });
-
-    const res = await startUpload([file]);
-
-    if (!res) {
-      toast.error("Error uploading PDF", { id: "processing" });
-      return;
-    }
-
-    toast.success("PDF uploaded successfully. Summarizing...", {
-      id: "processing",
-    });
-
-    console.log(validatedFields.data.file);
   };
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
-      <UploadFormInput onSubmit={handleSubmit} />
+      <UploadFormInput
+        ref={formRef}
+        isLoading={isLoading}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };
