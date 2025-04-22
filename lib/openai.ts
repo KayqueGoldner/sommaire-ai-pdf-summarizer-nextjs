@@ -24,6 +24,10 @@ export async function generateSummaryFromOpenAI(pdfText: string) {
       max_tokens: 1500,
     });
 
+    if (!response.choices[0].message.content) {
+      throw new Error("No response from openai");
+    }
+
     return response.choices[0].message.content;
   } catch (error: any) {
     if (error?.status === 429) {

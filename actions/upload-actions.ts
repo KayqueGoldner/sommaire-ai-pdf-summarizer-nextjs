@@ -1,5 +1,6 @@
 "use server";
 
+import { generateSummaryFromGemini } from "@/lib/gemini";
 import { fetchAndExtractPdfText } from "@/lib/langchain";
 import { generateSummaryFromOpenAI } from "@/lib/openai";
 
@@ -47,6 +48,16 @@ export async function generatePdfSummary(
       console.log(summary);
     } catch (error) {
       console.error(error);
+      // call gemini api instead
+      if (error instanceof Error && error.message === "RATE_LIMIT_EXCEEDED") {
+        try {
+          summary = await generateSummaryFromGemini(pdfText);
+          console.log(summary);
+        } catch (geminiError) {
+          console.error("Error generating summary from gemini", geminiError);
+          throw new Error("Error generating summary from gemini");
+        }
+      }
     }
 
     if (!summary) {
