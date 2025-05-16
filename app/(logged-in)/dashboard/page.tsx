@@ -8,15 +8,16 @@ import { Button } from "@/components/ui/button";
 import { SummaryCard } from "@/components/summaries/summary-card";
 import { getSummaries } from "@/lib/summaries";
 import { EmptySummaryState } from "@/components/summaries/empty-summary-state";
+import { hasReachedUploadLimit } from "@/lib/user";
 
 const DashboardPage = async () => {
-  const uploadLimit = 5;
   const user = await currentUser();
 
   if (!user?.id) {
     redirect("/sign-in");
   }
 
+  const { hasReachedLimit, uploadLimit } = await hasReachedUploadLimit(user.id);
   const summaries = await getSummaries(user.id);
 
   return (
@@ -33,32 +34,36 @@ const DashboardPage = async () => {
                 Transform your PDFs into concise, actionable insights.
               </p>
             </div>
-            <Button
-              className="bg-linear-to-r from-rose-500 to-rose-700 text-white transition-all duration-300 hover:scale-105 hover:from-rose-600 hover:to-rose-800"
-              asChild
-            >
-              <Link href="/upload">
-                <PlusIcon className="mr-2 size-4" />
-                New Summary
-              </Link>
-            </Button>
-          </div>
-          <div className="mb-6">
-            <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 p-4 text-rose-800">
-              <p className="text-sm">
-                You've reached the limit of {uploadLimit} uploads on the basic
-                plan.
-              </p>
-              <Link
-                href="/#pricing"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-800 underline underline-offset-4"
+            {!hasReachedLimit && (
+              <Button
+                className="bg-linear-to-r from-rose-500 to-rose-700 text-white transition-all duration-300 hover:scale-105 hover:from-rose-600 hover:to-rose-800"
+                asChild
               >
-                Upgrade to Pro
-                <ArrowRightIcon className="inline-block size-4" />
-              </Link>
-              <span className="text-sm">for unlimited uploads.</span>
-            </div>
+                <Link href="/upload">
+                  <PlusIcon className="mr-2 size-4" />
+                  New Summary
+                </Link>
+              </Button>
+            )}
           </div>
+          {hasReachedLimit && (
+            <div className="mb-6">
+              <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 p-4 text-rose-800">
+                <p className="text-sm">
+                  You've reached the limit of {uploadLimit} uploads on the basic
+                  plan.
+                </p>
+                <Link
+                  href="/#pricing"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-800 underline underline-offset-4"
+                >
+                  Upgrade to Pro
+                  <ArrowRightIcon className="inline-block size-4" />
+                </Link>
+                <span className="text-sm">for unlimited uploads.</span>
+              </div>
+            </div>
+          )}
 
           {summaries.length === 0 ? (
             <EmptySummaryState />
