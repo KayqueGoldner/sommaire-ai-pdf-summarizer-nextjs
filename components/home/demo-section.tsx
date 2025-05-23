@@ -1,5 +1,9 @@
 import { PizzaIcon } from "lucide-react";
 
+import { SUMMARY_DEMO } from "@/utils/prompts";
+import { MotionDiv, MotionH3 } from "@/components/common/motion-wrapper";
+import { SummaryViewer } from "@/components/summaries/summary-viewer";
+
 export const DemoSection = () => {
   return (
     <section className="relative">
@@ -21,18 +25,28 @@ export const DemoSection = () => {
             <PizzaIcon className="size-6 text-rose-500" />
           </div>
           <div className="mb-16 text-center">
-            <h3 className="mx-auto max-w-2xl px-4 text-3xl font-bold sm:px-6">
+            <MotionH3
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mx-auto max-w-2xl px-4 text-3xl font-bold sm:px-6"
+            >
               Watch how Sommaire transforms{" "}
               <span className="bg-linear-to-r from-rose-500 to-rose-700 bg-clip-text text-transparent">
                 this Next.js course PDF
               </span>{" "}
               into an easy-to-read summary!
-            </h3>
+            </MotionH3>
           </div>
-
-          <div className="flex items-center justify-center px-2 sm:px-4 lg:px-6">
-            {/* Summary viewer */}
-          </div>
+        </div>
+        <div className="w-full items-center justify-center px-2 sm:px-4 lg:px-6">
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <SummaryViewer summary={SUMMARY_DEMO} />
+          </MotionDiv>
         </div>
       </div>
     </section>

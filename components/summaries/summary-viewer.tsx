@@ -14,6 +14,8 @@ import {
   parsePoint,
   parseSection,
 } from "@/utils/summary-helper";
+import { MotionDiv } from "@/components/common/motion-wrapper";
+import { containerVariants, itemVariants } from "@/utils/constants";
 
 import { ProgressBar } from "./progress-bar";
 import { NavigationControls } from "./navigation-controls";
@@ -45,12 +47,19 @@ export const SummaryViewer = ({ summary }: SummaryViewerProps) => {
       <CardHeader className="py-0 pt-10">
         <SectionTitle title={sections[currentSection].title} />
       </CardHeader>
-      <CardContent className="pb-20">
-        <div className="scrollbar-hide h-full overflow-y-auto">
+      <CardContent className="w-full pb-20">
+        <MotionDiv
+          key={currentSection}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          exit={{ opacity: 0 }}
+          className="scrollbar-hide h-full overflow-y-auto"
+        >
           <div className="px-4 sm:px-6">
             <SectionContent points={sections[currentSection].points} />
           </div>
-        </div>
+        </MotionDiv>
       </CardContent>
       <CardFooter>
         <NavigationControls
@@ -75,7 +84,14 @@ function SectionTitle({ title }: { title: string }) {
 
 function SectionContent({ points }: { points: string[] }) {
   return (
-    <ul className="space-y-4">
+    <MotionDiv
+      key={points.join("")}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className="space-y-4"
+    >
       {points.map((point) => {
         const { isNumbered, isMainPoint, hasEmoji, isEmpty } =
           parsePoint(point);
@@ -88,7 +104,7 @@ function SectionContent({ points }: { points: string[] }) {
 
         return <RegularPoint key={point} point={point} />;
       })}
-    </ul>
+    </MotionDiv>
   );
 }
 
@@ -96,23 +112,29 @@ function EmojiPoint({ point }: { point: string }) {
   const { emoji, text } = parseEmojiPoint(point) || {};
 
   return (
-    <li className="group bg-muted-foreground/5 relative rounded-2xl border p-4">
+    <MotionDiv
+      variants={itemVariants}
+      className="group bg-muted-foreground/5 relative rounded-2xl border p-4"
+    >
       <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-gray-500/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="relative flex items-start gap-3 px-2">
         <span className="shrink-0 pt-1 text-lg lg:text-xl">{emoji}</span>
         <p className="text-muted-foreground/90 text-sm lg:text-xl">{text}</p>
       </div>
-    </li>
+    </MotionDiv>
   );
 }
 
 function RegularPoint({ point }: { point: string }) {
   return (
-    <li className="group bg-muted-foreground/5 relative rounded-2xl border p-4">
+    <MotionDiv
+      variants={itemVariants}
+      className="group bg-muted-foreground/5 relative rounded-2xl border p-4"
+    >
       <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-gray-500/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
       <p className="text-muted-foreground/90 relative text-left text-sm leading-snug lg:text-xl">
         {point}
       </p>
-    </li>
+    </MotionDiv>
   );
 }

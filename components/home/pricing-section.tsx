@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { ArrowRightIcon, CheckIcon } from "lucide-react";
 
-import { pricingPlans } from "@/utils/constants";
 import { cn } from "@/lib/utils";
+import {
+  containerVariants,
+  itemVariants,
+  pricingPlans,
+} from "@/utils/constants";
+import { MotionDiv, MotionSection } from "@/components/common/motion-wrapper";
 
 type Plans = {
   id: string;
@@ -14,6 +19,20 @@ type Plans = {
   paymentLink: string;
 };
 
+const listVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: "spring",
+      duration: 0.5,
+      damping: 20,
+      stiffness: 100,
+    },
+  },
+};
+
 const PricingCard = ({
   name,
   price,
@@ -23,38 +42,51 @@ const PricingCard = ({
   paymentLink,
 }: Plans) => {
   return (
-    <div className="relative w-full max-w-lg duration-300 hover:scale-105 hover:transition-all">
+    <MotionDiv
+      variants={listVariants}
+      whileHover={{ scale: 1.02 }}
+      className="relative w-full max-w-lg duration-300 hover:scale-105 hover:transition-all"
+    >
       <div
         className={cn(
           "relative z-10 flex h-full flex-col gap-4 rounded-2xl border border-gray-500/20 p-8 lg:gap-8",
           id === "pro" && "gap-5 border-2 border-rose-500",
         )}
       >
-        <div className="flex items-center justify-between gap-4">
+        <MotionDiv
+          variants={listVariants}
+          className="flex items-center justify-between gap-4"
+        >
           <div>
             <p className="text-lg font-bold capitalize lg:text-xl">{name}</p>
             <p className="text-base-content/80 mt-2">{description}</p>
           </div>
-        </div>
+        </MotionDiv>
 
-        <div className="flex gap-2">
+        <MotionDiv variants={listVariants} className="flex gap-2">
           <p className="text-5xl font-extrabold tracking-tight">${price}</p>
           <div className="mb-1 flex flex-col justify-end">
             <p className="text-xs font-semibold uppercase">USD</p>
             <p className="text-xs">/month</p>
           </div>
-        </div>
+        </MotionDiv>
 
-        <div className="flex-1 space-y-2.5 text-base leading-relaxed">
+        <MotionDiv
+          variants={listVariants}
+          className="flex-1 space-y-2.5 text-base leading-relaxed"
+        >
           {items.map((item, index) => (
             <li key={index} className="flex items-center gap-2">
               <CheckIcon size={18} />
               <span>{item}</span>
             </li>
           ))}
-        </div>
+        </MotionDiv>
 
-        <div className="flex w-full justify-center space-y-2">
+        <MotionDiv
+          variants={listVariants}
+          className="flex w-full justify-center space-y-2"
+        >
           <Link
             href={paymentLink}
             className={cn(
@@ -66,27 +98,37 @@ const PricingCard = ({
           >
             Buy Now <ArrowRightIcon size={18} />
           </Link>
-        </div>
+        </MotionDiv>
       </div>
-    </div>
+    </MotionDiv>
   );
 };
 
 export const PricingSection = () => {
   return (
-    <section className="relative overflow-hidden" id="pricing">
+    <MotionSection
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-100px" }}
+      className="relative overflow-hidden"
+      id="pricing"
+    >
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8 lg:py-24 lg:pt-12">
-        <div className="flex w-full items-center justify-center pb-12">
+        <MotionDiv
+          variants={itemVariants}
+          className="flex w-full items-center justify-center pb-12"
+        >
           <h2 className="mb-8 text-xl font-bold text-rose-500 uppercase">
             Pricing
           </h2>
-        </div>
+        </MotionDiv>
         <div className="relative flex flex-col items-center justify-center gap-8 lg:flex-row lg:items-stretch">
           {pricingPlans.map((plan) => (
             <PricingCard key={plan.id} {...plan} />
           ))}
         </div>
       </div>
-    </section>
+    </MotionSection>
   );
 };

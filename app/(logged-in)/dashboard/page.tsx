@@ -9,6 +9,8 @@ import { SummaryCard } from "@/components/summaries/summary-card";
 import { getSummaries } from "@/lib/summaries";
 import { EmptySummaryState } from "@/components/summaries/empty-summary-state";
 import { hasReachedUploadLimit } from "@/lib/user";
+import { MotionDiv } from "@/components/common/motion-wrapper";
+import { itemVariants } from "@/utils/constants";
 
 const DashboardPage = async () => {
   const user = await currentUser();
@@ -26,28 +28,45 @@ const DashboardPage = async () => {
       <div className="container mx-auto flex flex-col gap-4">
         <div className="px-2 py-12 sm:py-24">
           <div className="mb-8 flex justify-between gap-4">
-            <div className="flex flex-col gap-2">
+            <MotionDiv
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              className="flex flex-col gap-2"
+            >
               <h1 className="bg-gradient-to-r from-gray-600 to-gray-900 bg-clip-text text-4xl font-bold tracking-tight text-transparent">
                 Your Summaries
               </h1>
               <p className="text-gray-600">
                 Transform your PDFs into concise, actionable insights.
               </p>
-            </div>
+            </MotionDiv>
             {!hasReachedLimit && (
-              <Button
-                className="bg-linear-to-r from-rose-500 to-rose-700 text-white transition-all duration-300 hover:scale-105 hover:from-rose-600 hover:to-rose-800"
-                asChild
+              <MotionDiv
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover={{ scale: 1.05 }}
               >
-                <Link href="/upload">
-                  <PlusIcon className="mr-2 size-4" />
-                  New Summary
-                </Link>
-              </Button>
+                <Button
+                  className="bg-linear-to-r from-rose-500 to-rose-700 text-white transition-all duration-300 hover:scale-105 hover:from-rose-600 hover:to-rose-800"
+                  asChild
+                >
+                  <Link href="/upload">
+                    <PlusIcon className="mr-2 size-4" />
+                    New Summary
+                  </Link>
+                </Button>
+              </MotionDiv>
             )}
           </div>
-          {hasReachedLimit && (
-            <div className="mb-6">
+          {!hasReachedLimit && (
+            <MotionDiv
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              className="mb-6"
+            >
               <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 p-4 text-rose-800">
                 <p className="text-sm">
                   You've reached the limit of {uploadLimit} uploads on the basic
@@ -62,7 +81,7 @@ const DashboardPage = async () => {
                 </Link>
                 <span className="text-sm">for unlimited uploads.</span>
               </div>
-            </div>
+            </MotionDiv>
           )}
 
           {summaries.length === 0 ? (

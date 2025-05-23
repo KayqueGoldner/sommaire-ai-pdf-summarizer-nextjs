@@ -121,11 +121,35 @@ export const UploadForm = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center" aria-hidden>
+          <div className="w-full border-t border-gray-200 dark:border-gray-800" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-background text-muted-foreground px-3 text-sm">
+            Upload PDF
+          </span>
+        </div>
+      </div>
       <UploadFormInput
         ref={formRef}
         isLoading={isLoading}
         onSubmit={handleSubmit}
       />
+      {isLoading && (
+        <>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center" aria-hidden>
+              <div className="w-full border-t border-gray-200 dark:border-gray-800" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-background text-muted-foreground px-3 text-sm">
+                Processing
+              </span>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

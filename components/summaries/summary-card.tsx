@@ -4,6 +4,8 @@ import { formatDistanceToNow } from "date-fns";
 
 import { Card } from "@/components/ui/card";
 import { cn, formatFileName } from "@/lib/utils";
+import { itemVariants } from "@/utils/constants";
+import { MotionDiv } from "@/components/common/motion-wrapper";
 
 import { DeleteButton } from "./delete-button";
 
@@ -13,7 +15,15 @@ interface SummaryCardProps {
 
 export const SummaryCard = ({ summary }: SummaryCardProps) => {
   return (
-    <div>
+    <MotionDiv
+      variants={itemVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover={{
+        scale: 1.02,
+        transition: { duration: 0.2, ease: "easeOut" },
+      }}
+    >
       <Card className="relative h-full">
         <div className="absolute top-2 right-2">
           <DeleteButton summaryId={summary.id} />
@@ -36,7 +46,7 @@ export const SummaryCard = ({ summary }: SummaryCardProps) => {
           </div>
         </Link>
       </Card>
-    </div>
+    </MotionDiv>
   );
 };
 

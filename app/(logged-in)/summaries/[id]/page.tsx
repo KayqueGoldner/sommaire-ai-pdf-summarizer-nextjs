@@ -6,6 +6,7 @@ import { BgGradient } from "@/components/common/bg-gradient";
 import { SummaryHeader } from "@/components/summaries/summary-header";
 import { SourceInfo } from "@/components/summaries/source-info";
 import { SummaryViewer } from "@/components/summaries/summary-viewer";
+import { MotionDiv } from "@/components/common/motion-wrapper";
 
 interface SummaryIdPageProps {
   params: Promise<{ id: string }>;
@@ -37,38 +38,48 @@ const SummaryIdPage = async ({ params }: SummaryIdPageProps) => {
 
       <div className="container mx-auto flex flex-col gap-4 py-10">
         <div className="px-4 py-6 sm:px-6 sm:py-12 lg:px-8 lg:py-24">
-          <div className="flex flex-col">
+          <MotionDiv
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col"
+          >
             <SummaryHeader
               title={title}
               createdAt={created_at}
               readingTime={readingTime}
             />
-          </div>
 
-          {file_name && (
-            <SourceInfo
-              fileName={file_name}
-              originalFileUrl={original_file_url}
-              title={title}
-              summaryText={summary_text}
-              createdAt={created_at}
-            />
-          )}
+            {file_name && (
+              <SourceInfo
+                fileName={file_name}
+                originalFileUrl={original_file_url}
+                title={title}
+                summaryText={summary_text}
+                createdAt={created_at}
+              />
+            )}
 
-          <div className="relative mt-4 sm:mt-8 lg:mt-16">
-            <div className="relative mx-auto max-w-4xl rounded-2xl border border-rose-100/30 bg-white/80 p-4 shadow-xl backdrop-blur-md transition-all duration-300 hover:bg-white/90 hover:shadow-2xl sm:rounded-3xl sm:p-6 lg:p-8">
-              <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-rose-50/50 via-orange-50/30 to-transparent opacity-50 sm:rounded-3xl" />
+            <MotionDiv
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="relative mt-4 sm:mt-8 lg:mt-16"
+            >
+              <div className="relative mx-auto max-w-4xl rounded-2xl border border-rose-100/30 bg-white/80 p-4 shadow-xl backdrop-blur-md transition-all duration-300 hover:bg-white/90 hover:shadow-2xl sm:rounded-3xl sm:p-6 lg:p-8">
+                <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-rose-50/50 via-orange-50/30 to-transparent opacity-50 sm:rounded-3xl" />
 
-              <div className="text-muted-foreground absolute top-2 right-2 flex items-center gap-1.5 rounded-md bg-white/90 px-2 py-1 text-xs shadow-xs sm:top-4 sm:right-4 sm:gap-2 sm:px-3 sm:py-1.5 sm:text-sm">
-                <FileTextIcon className="size-3 text-rose-400 sm:size-4" />
-                {word_count?.toLocaleString()} words
+                <div className="text-muted-foreground absolute top-2 right-2 flex items-center gap-1.5 rounded-md bg-white/90 px-2 py-1 text-xs shadow-xs sm:top-4 sm:right-4 sm:gap-2 sm:px-3 sm:py-1.5 sm:text-sm">
+                  <FileTextIcon className="size-3 text-rose-400 sm:size-4" />
+                  {word_count?.toLocaleString()} words
+                </div>
+
+                <div className="relative mt-8 flex justify-center sm:mt-6">
+                  <SummaryViewer summary={summary_text} />
+                </div>
               </div>
-
-              <div className="relative mt-8 flex justify-center sm:mt-6">
-                <SummaryViewer summary={summary_text} />
-              </div>
-            </div>
-          </div>
+            </MotionDiv>
+          </MotionDiv>
         </div>
       </div>
     </div>
