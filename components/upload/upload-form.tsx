@@ -12,6 +12,7 @@ import {
 } from "@/actions/upload-actions";
 
 import { UploadFormInput } from "./upload-form-input";
+import { LoadingSkeleton } from "./loading-skeleton";
 
 const schema = z.object({
   file: z
@@ -148,6 +149,7 @@ export const UploadForm = () => {
               </span>
             </div>
           </div>
+          <LoadingSkeleton />
         </>
       )}
     </div>
