@@ -9,7 +9,7 @@ import { generateSummaryFromOpenAI } from "@/lib/openai";
 import { getDbConnection } from "@/lib/db";
 import { formatFileNameAsTitle } from "@/utils/format-utils";
 
-export async function generatePdfSummary(
+export async function generatePdfText(
   uploadResponse: {
     serverData: {
       userId: string;
@@ -46,17 +46,72 @@ export async function generatePdfSummary(
   try {
     const pdfText = await fetchAndExtractPdfText(pdfUrl);
 
+    if (!pdfText) {
+      return {
+        success: false,
+        message: "Error to fetch and extract PDF text",
+        data: null,
+      };
+    }
+
+    const fomattedFileName = formatFileNameAsTitle(fileName);
+
+    return {
+      success: true,
+      message: "PDF text fetched successfully",
+      data: {
+        title: fomattedFileName,
+        pdfText,
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Failed to fetch and extract PDF text",
+      data: null,
+    };
+  }
+}
+
+export async function generatePdfSummary(
+  uploadResponse: {
+    serverData: {
+      userId: string;
+      file: {
+        url: string;
+        ufsUrl: string;
+        name: string;
+      };
+    };
+  }[],
+) {
+  const {
+    serverData: {
+      userId,
+      file: { ufsUrl: pdfUrl, name: fileName },
+    },
+  } = uploadResponse[0];
+
+  if (!pdfUrl) {
+    return {
+      success: false,
+      message: "PDF URL not found",
+      data: null,
+    };
+  }
+
+  try {
     let summary;
 
     try {
-      summary = await generateSummaryFromOpenAI(pdfText);
+      summary = await generateSummaryFromOpenAI(pdfUrl);
       console.log(summary);
     } catch (error) {
       console.error(error);
       // call gemini api instead
       if (error instanceof Error && error.message === "RATE_LIMIT_EXCEEDED") {
         try {
-          summary = await generateSummaryFromGemini(pdfText);
+          summary = await generateSummaryFromGemini(pdfUrl);
           console.log(summary);
         } catch (geminiError) {
           console.error("Error generating summary from gemini", geminiError);
@@ -73,14 +128,12 @@ export async function generatePdfSummary(
       };
     }
 
-    const fomattedFileName = formatFileNameAsTitle(fileName);
-
     return {
       success: true,
       message: "Summary generated successfully",
       data: {
         summary,
-        title: fomattedFileName,
+        title: fileName,
       },
     };
   } catch (error) {
